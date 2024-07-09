@@ -18,8 +18,9 @@ std::string generateSoundex(const std::string& name) {
     if (name.empty()) return "";
 
     std::string soundex;
-    soundex += toupper(name[0]);
+    soundex.reserve(4); // Reserve space for 4 characters
 
+    soundex += toupper(name[0]);
     char prevCode = getSoundexCode(name[0]);
 
     for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
@@ -30,7 +31,7 @@ std::string generateSoundex(const std::string& name) {
         }
     }
 
-    soundex.append(4 - soundex.length(), '0');
+    soundex.append(4 - soundex.length(), '0'); // Pad with zeros if necessary
 
     return soundex;
 }
