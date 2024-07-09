@@ -1,6 +1,7 @@
 #include "Soundex.h"
 #include <cctype>
 
+// Helper function to get Soundex code for a character
 char getSoundexCode(char c) {
     c = toupper(c);
     switch (c) {
@@ -14,24 +15,27 @@ char getSoundexCode(char c) {
     }
 }
 
+// Main function to generate Soundex code for a name
 std::string generateSoundex(const std::string& name) {
     if (name.empty()) return "";
 
     std::string soundex;
     soundex.reserve(4); // Reserve space for 4 characters
 
-    soundex += toupper(name[0]);
-    char prevCode = getSoundexCode(name[0]);
+    soundex += toupper(name[0]); // Add the first character
 
+    char prevCode = getSoundexCode(name[0]); // Get Soundex code for the first character
+
+    // Iterate through the remaining characters in the name
     for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
-        char code = getSoundexCode(name[i]);
-        if (code != '0' && code != prevCode) {
-            soundex += code;
-            prevCode = code;
+        char code = getSoundexCode(name[i]); // Get Soundex code for the current character
+        if (code != '0' && code != prevCode) { // Check if code is valid and different from previous
+            soundex += code; // Add valid code to Soundex string
+            prevCode = code; // Update previous code
         }
     }
 
-    soundex.append(4 - soundex.length(), '0'); // Pad with zeros if necessary
+    soundex.append(4 - soundex.length(), '0'); // Pad with zeros if necessary to ensure length 4
 
-    return soundex;
+    return soundex; // Return the generated Soundex code
 }
