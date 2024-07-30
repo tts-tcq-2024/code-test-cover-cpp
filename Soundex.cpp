@@ -1,41 +1,43 @@
 #include "Soundex.h"
 #include <cctype>
+#include <unordered_map>
 
-// Helper function to get Soundex code for a character
 char getSoundexCode(char c) {
-    c = toupper(c);
-    switch (c) {
-        case 'B': case 'F': case 'P': case 'V': return '1';
-        case 'C': case 'G': case 'J': case 'K': case 'Q': case 'S': case 'X': case 'Z': return '2';
-        case 'D': case 'T': return '3';
-        case 'L': return '4';
-        case 'M': case 'N': return '5';
-        case 'R': return '6';
-        default: return '0'; // For A, E, I, O, U, H, W, Y
-    }
+    static const std::unordered_map<char, char> soundexMap = {
+        {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'},
+        {'C', '2'}, {'G', '2'}, {'J', '2'}, {'K', '2'},
+        {'Q', '2'}, {'S', '2'}, {'X', '2'}, {'Z', '2'},
+        {'D', '3'}, {'T', '3'},
+        {'L', '4'},
+        {'M', '5'}, {'N', '5'},
+        {'R', '6'}
+    };
+    auto it = soundexMap.find(toupper(c));
+    return it == soundexMap.end() ? '0' : it->second;
 }
 
-// Main function to generate Soundex code for a name
 std::string generateSoundex(const std::string& name) {
     if (name.empty()) return "";
 
     std::string soundex;
-    soundex.reserve(4); // Reserve space for 4 characters
+    soundex.reserve(4);
 
-    soundex += toupper(name[0]); // Add the first character
+    char firstChar = toupper(name[0]);
+    soundex += firstChar;
 
-    char prevCode = getSoundexCode(name[0]); // Get Soundex code for the first character
+    char prevCode = getSoundexCode(firstChar);
 
-    // Iterate through the remaining characters in the name
     for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
-        char code = getSoundexCode(name[i]); // Get Soundex code for the current character
-        if (code != '0' && code != prevCode) { // Check if code is valid and different from previous
-            soundex += code; // Add valid code to Soundex string
-            prevCode = code; // Update previous code
+        char code = getSoundexCode(name[i]);
+        if (code != '0' && code != prevCode) {
+            soundex += code;
+            prevCode = code;
+        } else if (code == '0' && (name[i] == 'H' || name[i] == 'W') && i + 1 < name.length()) {
+            char nextCode = getSoundexCode(name[i + 1]);
+            if (nextCode == prevCode) continue;
         }
     }
 
-    soundex.append(4 - soundex.length(), '0'); // Pad with zeros if necessary to ensure length 4
-
-    return soundex; // Return the generated Soundex code
+    soundex.append(4 - soundex.length(), '0');
+    return soundex;
 }
